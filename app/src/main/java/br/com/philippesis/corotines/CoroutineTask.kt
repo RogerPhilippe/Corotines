@@ -23,10 +23,10 @@ abstract class CoroutineTask {
         posExecute()
     }
 
-    abstract fun preExecute()
+    open fun preExecute() {}
 
     abstract fun doInBackground()
 
-    abstract fun posExecute()
+    open fun posExecute() {}
 
 }

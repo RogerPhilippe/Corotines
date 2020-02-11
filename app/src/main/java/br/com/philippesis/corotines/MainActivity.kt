@@ -1,8 +1,9 @@
 package br.com.philippesis.corotines
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Activity
 import android.os.Bundle
-import kotlinx.coroutines.*
+import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -12,25 +13,37 @@ class MainActivity : AppCompatActivity() {
 
         println("Before Coroutine call.")
         //preExecute()
-        Work().run()
+        Work(this).run()
         println("After Coroutine call.")
-
+        mainLabel.text = "Running..."
     }
 
-    class Work : CoroutineTask() {
+    fun updateLabel(value: String) {
+        this.runOnUiThread { mainLabel.text = value }
+    }
+
+    class Work(val parent: Activity) : CoroutineTask() {
+
         override fun preExecute() {
-            println("Pre Execute")
+            super.preExecute()
+            println("Pre Execute.")
         }
 
         override fun doInBackground() {
-            println("Running")
-            Thread.sleep(2000)
+            println("Running.")
+            var count = 3
+            do {
+                println("Calculing step $count")
+                count--
+                Thread.sleep(1000)
+            } while (count > 0)
         }
 
         override fun posExecute() {
-            println("Pos Execute")
+            super.posExecute()
+            println("Pos Execute.")
+            (parent as MainActivity).updateLabel("Finished!")
         }
-
 
     }
 
