@@ -2,6 +2,7 @@ package br.com.philippesis.corotines
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -11,39 +12,37 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        println("Before Coroutine call.")
-        //preExecute()
+        Log.i("MainActivity", "Before Coroutine call.")
         Work(this).run()
-        println("After Coroutine call.")
-        mainLabel.text = "Running..."
+        Log.i("MainActivity", "After Coroutine call.")
+        this.updateLabel("Running...")
     }
 
+    // Update Screen Label
     fun updateLabel(value: String) {
-        this.runOnUiThread { mainLabel.text = value }
+        mainLabel.text = value
     }
 
-    class Work(val parent: Activity) : CoroutineTask() {
+    // Async Task Coroutines Class Example
+    class Work(private val parent: Activity) : TaskCoroutines() {
 
-        override fun preExecute() {
-            super.preExecute()
-            println("Pre Execute.")
+        override fun onPreExecute() {
+            super.onPreExecute()
+            Log.i("MainActivity", "onPreExecute.")
         }
 
-        override fun doInBackground() {
-            println("Running.")
-            var count = 3
-            do {
-                println("Calculing step $count")
-                count--
-                Thread.sleep(1000)
-            } while (count > 0)
+        override fun doInBackground(): Any {
+            Thread.sleep(4000)
+            Log.i("MainActivity", "onInBackground.")
+            return "Finish"
         }
 
-        override fun posExecute() {
-            super.posExecute()
-            println("Pos Execute.")
-            (parent as MainActivity).updateLabel("Finished!")
+        override fun onPostExecute(result: Any) {
+            super.onPostExecute(result)
+            Log.i("MainActivity", "onPosExecute.")
+            (parent as MainActivity).updateLabel(result as String)
         }
+
 
     }
 

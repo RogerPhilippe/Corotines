@@ -2,31 +2,48 @@ package br.com.philippesis.corotines
 
 import kotlinx.coroutines.*
 
-abstract class CoroutineTask {
+abstract class TaskCoroutines {
 
     /**
      * Start Coroutine.
      */
     fun run() = GlobalScope.launch(Dispatchers.Main) {
-        preExecute()
-        withContext(Dispatchers.IO) { execute() }
+        onPreExecute()
+        val result = withContext(Dispatchers.IO) { execute() }
+        onPostExecute(result)
     }
 
     /**
      * Execute Coroutine.
      */
-    private fun execute() = runBlocking {
+    private fun execute(): Any = runBlocking {
 
-        withContext(Dispatchers.IO) {
-            doInBackground()
+        return@runBlocking withContext(Dispatchers.IO) {
+            return@withContext doInBackground()
         }
-        posExecute()
     }
 
-    open fun preExecute() {}
+    /**
+     * Runs on the UI thread before {@link #doInBackground}.
+     *
+     */
+    open fun onPreExecute() {}
 
-    abstract fun doInBackground()
+    /**
+     * Override this method to perform a computation on a background thread.
+     *
+     * @return A result, defined by the subclass of this task.
+     *
+     */
+    abstract fun doInBackground(): Any
 
-    open fun posExecute() {}
+    /**
+     * <p>Runs on the UI thread after {@link #doInBackground}. The
+     * specified result is the value returned by {@link #doInBackground}.</p>
+     *
+     * @param result The result of the operation computed by {@link #doInBackground}.
+     *
+     */
+    open fun onPostExecute(result: Any) {}
 
 }
