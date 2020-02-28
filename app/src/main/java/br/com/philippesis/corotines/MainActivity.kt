@@ -5,15 +5,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         Log.i("MainActivity", "Before Coroutine call.")
-        Work(this).run()
+        var work = Work(this).execute()
         Log.i("MainActivity", "After Coroutine call.")
         this.updateLabel("Running...")
     }
@@ -24,14 +24,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Async Task Coroutines Class Example
-    class Work(private val parent: Activity) : TaskCoroutines() {
-
+    class Work(private val parent: Activity) : TaskCoroutines(Dispatchers.Default) {
         override fun onPreExecute() {
             super.onPreExecute()
             Log.i("MainActivity", "onPreExecute.")
         }
 
-        override fun doInBackground(): Any {
+        override fun doInBackground( vararg args: Any): Any {
             Thread.sleep(4000)
             Log.i("MainActivity", "onInBackground.")
             return "Finish"
@@ -42,7 +41,6 @@ class MainActivity : AppCompatActivity() {
             Log.i("MainActivity", "onPosExecute.")
             (parent as MainActivity).updateLabel(result as String)
         }
-
 
     }
 

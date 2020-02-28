@@ -2,26 +2,17 @@ package br.com.philippesis.corotines
 
 import kotlinx.coroutines.*
 
-abstract class TaskCoroutines {
+abstract class TaskCoroutines(var selectedThread : CoroutineDispatcher = Dispatchers.IO) {
 
     /**
      * Start Coroutine.
      */
-    fun run() = GlobalScope.launch(Dispatchers.Main) {
+    fun execute(vararg args: Any) = GlobalScope.launch(Dispatchers.Main) {
         onPreExecute()
-        val result = withContext(Dispatchers.IO) { execute() }
+        val result = withContext(selectedThread ) { doInBackground(args) }
         onPostExecute(result)
     }
 
-    /**
-     * Execute Coroutine.
-     */
-    private fun execute(): Any = runBlocking {
-
-        return@runBlocking withContext(Dispatchers.IO) {
-            return@withContext doInBackground()
-        }
-    }
 
     /**
      * Runs on the UI thread before {@link #doInBackground}.
@@ -35,7 +26,7 @@ abstract class TaskCoroutines {
      * @return A result, defined by the subclass of this task.
      *
      */
-    abstract fun doInBackground(): Any
+    abstract fun doInBackground(vararg  arguments:Any): Any
 
     /**
      * <p>Runs on the UI thread after {@link #doInBackground}. The
